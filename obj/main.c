@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-
 struct header_posix_ustar {
 	char name[100];
 	char mode[8];
@@ -32,8 +31,6 @@ struct struct_interm{
 	struct header_posix_ustar ma_struct;
 	char* name;
 };
-
-
 
 int main (int argc, char* argv[]){
 	char* archive=argv[1];

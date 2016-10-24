@@ -6,6 +6,9 @@
 #include "utilitaires.h"
 #include "extracteur.h"
 
+
+
+
 void listeur(int fd, struct header_posix_ustar ma_struct,char* archive){
 	int lu=read(fd,&ma_struct,512);
 	int size;

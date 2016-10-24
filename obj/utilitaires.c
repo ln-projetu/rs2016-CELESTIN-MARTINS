@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdio.h>
-#include <stdib.h>
+#include <stdlib.h>
 #include "utilitaires.h"
 #include "extracteur.h"
 
