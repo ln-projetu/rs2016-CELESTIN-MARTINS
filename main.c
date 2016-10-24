@@ -33,6 +33,19 @@ struct struct_interm{
 	char* name;
 };
 
+int convert_oct_to_dec(char *octalChar){
+	int nbDec=0;
+	int nbOctal = atoi(octalChar);
+	int pow8 = 1;
+	while((nbOctal)!=0){
+ 		nbDec=nbDec+pow8*(nbOctal%10);
+ 		nbOctal/=10;
+ 		pow8*=8;
+ 	}
+
+	return nbDec;
+}
+
 void listeur(int fd, struct header_posix_ustar ma_struct,char* archive){
 	int lu=read(fd,&ma_struct,512);
 	int size;
@@ -45,21 +58,8 @@ void listeur(int fd, struct header_posix_ustar ma_struct,char* archive){
 		lu=read(fd,&ma_struct,512);
 		if (strlen(ma_struct.name)!=0)
 			printf("-%s\n",ma_struct.name);
+			printf("%s\n", sizeof(ma_struct.name));
 	}
-}
-
-
-int convert_oct_to_dec(char *octalChar){
-	int nbDec=0;
-	int nbOctal = atoi(octalChar);
-	int pow8 = 1;
-	while((nbOctal)!=0){
- 		nbDec=nbDec+pow8*(nbOctal%10);
- 		nbOctal/=10;
- 		pow8*=8;
- 	}
-
-	return nbDec;
 }
 
 int main (int argc, char* argv[]){
