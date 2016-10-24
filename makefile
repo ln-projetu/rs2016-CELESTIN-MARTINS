@@ -1,6 +1,6 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-g -I$(IDIR)
+CFLAGS=-Wall -Wextra -g -I$(IDIR)
 
 ODIR=obj
 LDIR =../lib
@@ -24,3 +24,4 @@ main: $(OBJ)
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	
