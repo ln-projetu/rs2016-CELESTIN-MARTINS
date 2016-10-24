@@ -1,0 +1,16 @@
+
+Tests effectués au départ sur .tar.gz au lieu de .tar d'ou certains pbms
+
+
+Erreur lseek(fd,size+512,archive)!=lseek(fd,(size/512+1)*512,archive);
+|-> cause probable: si size<512 size/512 =0 donc resultats differents
+
+Pas mal de temps perdu à cause de mauvaise connaissance de github (pbm de merge)
+
+
+
+TEMPS 
+Conception
+Codage
+Rapport
+Tests
