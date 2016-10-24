@@ -54,7 +54,7 @@ void listeur(int fd, struct header_posix_ustar ma_struct,char* archive){
 	while (lu!=0){
 		size=convert_oct_to_dec(ma_struct.size);
 		if (size!=0)
-			lseek(fd,(size+512),SEEK_CUR);
+			lseek(fd,size+512,SEEK_CUR);
 		lu=read(fd,&ma_struct,512);
 		if (strlen(ma_struct.name)!=0)
 			printf("-%s\n",ma_struct.name);
