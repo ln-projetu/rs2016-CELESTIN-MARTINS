@@ -25,40 +25,45 @@ struct header_posix_ustar {
 }ma_struct;
 
 int main (int argc, char* argv[]){
-    int opt;
-    int i=1;
-    int option=0;
-    int fd;
-    while ((opt=getopt(argc, argv, "xlpz:"))!=-1){
-        switch(opt){
-            case 'x':
-                option=1;
-                i++;
-                printf("extrait le contenu de %s\n",argv[i]);
-                break;
-            case 'l':
-                if (option==0) i++;
-                option=1;
-                printf("listing détaillé de %s\n",argv[i]);
-                break;
-            case 'p':
-                if (option==0)i++;
-                option=1;
-                printf("utilisation de %s threads \n",argv[i]);
-                i++;
-                break;
-            case 'z':
-                if (option==0) i++;
-                option=1;
-                printf("décompression de %s\n",argv[i]);
-                break;
-            default:
-                printf("dans default" );
-                fd=open(argv[i],O_RDONLY);
-                listeur(fd, ma_struct,argv[i]);
-                close(fd);
-                exit(0);
-        }
-    }
-    return(0);
+	int opt;
+	int i=1;
+	int option=0;
+	int fd;
+	
+	while ((opt=getopt(argc, argv, "xlpz:"))!=-1){
+		switch(opt){
+			case 'x':
+				if (option==0) i++;
+				option=1;
+				printf("extrait le contenu de %s\n",argv[i]);
+				break;
+			case 'l':
+				if (option==0) i++;
+				option=1;
+				printf("listing détaillé de %s\n",argv[i]);
+				break;
+			case 'p':
+				if (option==0)i++;
+				option=1;
+				printf("utilisation de %s threads \n",argv[i]);
+				i++;
+				break;
+			case 'z':
+				if (option==0) i++;
+				option=1;
+				printf("décompression de %s\n",argv[i]);
+				break;
+			default:
+				printf("erreur" );
+				exit(EXIT_FAILURE);
+		}
+	}
+	if (option==0){
+		fd=open(argv[i],O_RDONLY);
+		listeur(fd, ma_struct,argv[i]);
+		close(fd);
+	}
+	return(0);
 }
+
+
