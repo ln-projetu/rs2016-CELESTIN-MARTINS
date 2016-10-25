@@ -28,7 +28,7 @@ int main (int argc, char* argv[]){
 	int opt;
 	int option=0;
 	int fd;
-	while ((opt=getopt(argc, argv, "xlpz:"))!=-1){
+	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
 				option=1;
