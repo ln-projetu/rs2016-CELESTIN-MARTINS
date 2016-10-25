@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 
 struct header_posix_ustar {
     char name[100];
@@ -27,24 +28,31 @@ struct header_posix_ustar {
 int main (int argc, char* argv[]){
 	int opt;
 	int fd;
-	if (optind+1==argc){
-		fd=open(argv[argc-1],O_RDONLY);
-		listeur(fd, ma_struct,argv[argc-1]);
-		close(fd);
+	char* archive=argv[argc-1];
+	fd=open(archive,O_RDONLY);
+	if (fd==-1){
+		fprintf(stderr, "%s\n", strerror(errno));
+		exit(1);
 	}
+	if (optind+1==argc){
+		listeur(fd, ma_struct,archive);
+		close(fd);
+		exit(0);
+	}
+	close(fd);
 	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
-				printf("extrait le contenu de %s\n",argv[argc-1]);
+				printf("extrait le contenu de %s\n",archive);
 				break;
 			case 'l':
-				printf("listing détaillé de %s\n",argv[argc-1]);
+				printf("listing détaillé de %s\n",archive);
 				break;
 			case 'p':
 				printf("utilisation de %s threads \n",argv[2]);
 				break;
 			case 'z':
-				printf("décompression de %s\n",argv[argc-1]);
+				printf("décompression de %s\n",archive);
 				break;
 			default:
 				printf("erreur" );
