@@ -27,7 +27,6 @@ struct header_posix_ustar {
 int main (int argc, char* argv[]){
 	int opt;
 	int fd;
-
 	if (optind+1==argc){
 		fd=open(argv[argc-1],O_RDONLY);
 		listeur(fd, ma_struct,argv[argc-1]);
