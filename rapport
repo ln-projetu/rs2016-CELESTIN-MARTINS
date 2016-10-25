@@ -7,6 +7,8 @@ Erreur lseek(fd,size+512,archive)!=lseek(fd,(size/512+1)*512,archive);
 
 Pas mal de temps perdu à cause de mauvaise connaissance de github (pbm de merge)
 
+sites utilisés : 
+https://www.freebsd.org/cgi/man.cgi?query=tar&sektion=5
 
 
 TEMPS =5h
