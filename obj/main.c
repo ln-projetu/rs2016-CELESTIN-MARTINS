@@ -26,24 +26,25 @@ struct header_posix_ustar {
 
 int main (int argc, char* argv[]){
 	int opt;
-	int option=0;
 	int fd;
+
+	if (optind+1==argc){
+		fd=open(argv[argc-1],O_RDONLY);
+		listeur(fd, ma_struct,argv[argc-1]);
+		close(fd);
+	}
 	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
-				option=1;
 				printf("extrait le contenu de %s\n",argv[argc-1]);
 				break;
 			case 'l':
-				option=1;
 				printf("listing détaillé de %s\n",argv[argc-1]);
 				break;
 			case 'p':
-				option=1;
 				printf("utilisation de %s threads \n",argv[2]);
 				break;
 			case 'z':
-				option=1;
 				printf("décompression de %s\n",argv[argc-1]);
 				break;
 			default:
@@ -51,11 +52,7 @@ int main (int argc, char* argv[]){
 				exit(EXIT_FAILURE);
 		}
 	}
-	if (option==0){
-		fd=open(argv[argc-1],O_RDONLY);
-		listeur(fd, ma_struct,argv[argc-1]);
-		close(fd);
-	}
+	
 	return(0);
 }
 
