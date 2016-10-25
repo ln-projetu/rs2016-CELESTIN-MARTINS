@@ -33,7 +33,7 @@ int main (int argc, char* argv[]){
 		listeur(fd, ma_struct,argv[argc-1]);
 		close(fd);
 	}
-	while ((opt=getopt(argc, argv, "xlpz:"))!=-1){
+	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
 				printf("extrait le contenu de %s\n",argv[argc-1]);
@@ -43,7 +43,6 @@ int main (int argc, char* argv[]){
 				break;
 			case 'p':
 				printf("utilisation de %s threads \n",argv[2]);
-
 				break;
 			case 'z':
 				printf("décompression de %s\n",argv[argc-1]);
