@@ -12,7 +12,10 @@ https://www.freebsd.org/cgi/man.cgi?query=tar&sektion=5
 http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
 
-TEMPS =5h
+TEMPS
+étape 1 =5h
+étape 2 =2h
+
 Conception
 Codage
 Rapport
