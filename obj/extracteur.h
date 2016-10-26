@@ -23,4 +23,8 @@ struct header_posix_ustar {
 
 void listeur(int fd, struct header_posix_ustar ma_struct,char* archive);
 
+void extractDossier(int fd, struct header_posix_ustar ma_struct);
+
+void extractFichier(int fd, struct  header_posix_ustar ma_struct);
+
 #endif
