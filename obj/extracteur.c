@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "utilitaires.h"
 #include "extracteur.h"
 
@@ -21,5 +23,26 @@ void listeur(int fd, struct header_posix_ustar ma_struct,char* archive){
 		lu=read(fd,&ma_struct,512);
 		if (strlen(ma_struct.name)!=0)
 			printf("-%s\n",ma_struct.name);
+	}
+}
+
+void extract(int fd, struct header_posix_ustar ma_struct, char *archive){
+	int lu=read(fd, &ma_struct,512);
+	int size;
+	int longueur;
+	//FILE *fichier=malloc(sizeof(FILE));
+	while(lu!=0){
+		size=convert_oct_to_dec(ma_struct.size);
+		if (size!=0)
+			lseek(fd,(size/512+1)*512,SEEK_CUR);
+		lu=read(fd,&ma_struct.name,512);
+		longueur=strlen(ma_struct.name);
+		if (longueur!=0){
+			if (ma_struct.name[longueur-1]=='/')
+				mkdir(ma_struct.name,0777);
+			else{
+
+			}
+		}
 	}
 }
