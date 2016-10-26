@@ -39,7 +39,7 @@ void extract(int fd, struct header_posix_ustar ma_struct, char *archive){
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
 			if (ma_struct.name[longueur-1]=='/')
-				mkdir(ma_struct.name,777);
+				mkdir(ma_struct.name,0777);
 			else{
 
 			}
