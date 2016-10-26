@@ -58,8 +58,10 @@ void extractFichier(int fd, struct  header_posix_ustar ma_struct){
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
-			if (ma_struct.name[longueur-1]!='/')
-				execlp("touch","touch",ma_struct.name,NULL);
+			if (ma_struct.name[longueur-1]!='/'){
+				if (fork()==0)
+					execlp("touch","touch",ma_struct.name,NULL);
+			}
 		}
 	}while(lu!=0);
 }
