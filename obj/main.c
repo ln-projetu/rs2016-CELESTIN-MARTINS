@@ -39,11 +39,15 @@ int main (int argc, char* argv[]){
 		close(fd);
 		exit(0);
 	}
+	int fdx;
 	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
 				printf("extrait le contenu de %s\n",archive);
-				extract(fd, ma_struct,archive);
+				extractDossier(fd, ma_struct);
+				fdx=open(archive,O_RDONLY);
+				extractFichier(fdx, ma_struct);
+				close (fdx);
 				break;
 			case 'l':
 				printf("listing détaillé de %s\n",archive);
@@ -59,8 +63,7 @@ int main (int argc, char* argv[]){
 				exit(EXIT_FAILURE);
 		}
 	}
-	close(fd);
-	
+	close(fd);	
 	return(0);
 }
 
