@@ -27,4 +27,6 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct);
 
 void extractFichier(int fd, struct  header_posix_ustar ma_struct);
 
+void ecrireFichier(int fd, char* nomFichier, int size);
+
 #endif
