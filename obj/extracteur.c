@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include "utilitaires.h"
 #include "extracteur.h"
 
@@ -56,8 +57,15 @@ void extractFichier(int fd, struct  header_posix_ustar ma_struct){
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
 			if (ma_struct.name[longueur-1]!='/'){
+<<<<<<< HEAD
 				if ((pid=fork())==0)
+=======
+				if (!(pid=fork())
+>>>>>>> e791f790db16bfe0f2b978e7f3d6afd6bb985d64
 					execlp("touch","touch",ma_struct.name,NULL);
+				/*else
+					waitpid(pid,&status,0);*/
+
 			}
 		}
 	}while(lu!=0);
