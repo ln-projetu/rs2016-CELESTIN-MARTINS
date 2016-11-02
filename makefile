@@ -17,7 +17,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -g -c -o $@ $< $(CFLAGS)
 
-main: $(OBJ)
+ptar: $(OBJ)
 	gcc -g -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
