@@ -29,7 +29,6 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 	int lu;
 	int size;
 	int longueur;
-	//FILE *fichier=malloc(sizeof(FILE));
 	do{
 		size=convert_oct_to_dec(ma_struct.size);
 		if (size!=0)
@@ -39,9 +38,6 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 		if (longueur!=0){
 			if (ma_struct.name[longueur-1]=='/')
 				mkdir(ma_struct.name,0777);
-			/*else{
-				execlp("touch","touch",ma_struct.name,NULL);
-			}*/
 		}
 	}while(lu!=0);
 }
@@ -50,6 +46,7 @@ void extractFichier(int fd, struct  header_posix_ustar ma_struct){
 	int lu;
 	int size;
 	int longueur;
+	int pid;
 	//FILE *fichier=malloc(sizeof(FILE));
 	do{
 		size=convert_oct_to_dec(ma_struct.size);
@@ -59,7 +56,7 @@ void extractFichier(int fd, struct  header_posix_ustar ma_struct){
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
 			if (ma_struct.name[longueur-1]!='/'){
-				if (fork()==0)
+				if ((pid=fork())==0)
 					execlp("touch","touch",ma_struct.name,NULL);
 			}
 		}
