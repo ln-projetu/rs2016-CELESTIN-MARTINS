@@ -32,8 +32,15 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 	int longueur;
 	do{
 		size=convert_oct_to_dec(ma_struct.size);
-		if (size!=0)
-			lseek(fd,(size/512+1)*512,SEEK_CUR);
+		if (size!=0){
+			if(size%512!=0)
+			{
+				lseek(fd,(size/512+1)*512,SEEK_CUR);
+			}
+			else
+				lseek(fd,(size/512)*512,SEEK_CUR);
+		}
+			
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
