@@ -21,12 +21,14 @@ struct header_posix_ustar {
 	char pad[12];
 }ma_struct;
 
-void listeur(int fd, struct header_posix_ustar ma_struct,char* archive);
+void listeur(int fd, struct header_posix_ustar ma_struct);
 
 void extractDossier(int fd, struct header_posix_ustar ma_struct);
 
 void extractFichier(int fd, struct  header_posix_ustar ma_struct);
 
 void ecrireFichier(int fd, char* nomFichier, int size);
+
+void listeur_detail(int fd, struct header_posix_ustar ma_struct);
 
 #endif

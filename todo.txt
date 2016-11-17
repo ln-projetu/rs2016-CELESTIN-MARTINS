@@ -1,1 +1,2 @@
--Exportation de structures
+demander si il faut mieux inclure dans le prog ou dans le makefile
+modifez param extractions (date;droits; etc)

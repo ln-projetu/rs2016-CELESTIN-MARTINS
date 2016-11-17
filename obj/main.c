@@ -4,26 +4,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include "extracteur.h"
+#include "utilitaires.h"
 
-struct header_posix_ustar {
-    char name[100];
-    char mode[8];
-    char uid[8];
-    char gid[8];
-    char size[12];
-    char mtime[12];
-    char checksum[8];
-    char typeflag[1];
-    char linkname[100];
-    char magic[6];
-    char version[2];
-    char uname[32];
-    char gname[32];
-    char devmajor[8];
-    char devminor[8];
-    char prefix[155];
-    char pad[12];
-}ma_struct;
+
 
 int main (int argc, char* argv[]){
 	int opt;
@@ -35,7 +19,7 @@ int main (int argc, char* argv[]){
 		exit(1);
 	}
 	if (optind+1==argc){
-		listeur(fd, ma_struct,archive);
+		listeur(fd, ma_struct);
 		close(fd);
 		exit(0);
 	}
@@ -43,20 +27,21 @@ int main (int argc, char* argv[]){
 	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
-				printf("extrait le contenu de %s\n",archive);
+				//printf("extrait le contenu de %s\n",archive);
 				extractDossier(fd, ma_struct);
 				fdx=open(archive,O_RDONLY);
-				extractFichier(fdx, ma_struct);
-				close (fdx);
+				extractFichier(fdx,ma_struct);
+				close(fdx);
 				break;
 			case 'l':
-				printf("listing détaillé de %s\n",archive);
+				//printf("listing détaillé de %s\n",archive);
+				listeur_detail(fd, ma_struct);
 				break;
 			case 'p':
-				printf("utilisation de %s threads \n",argv[2]);
+				//printf("utilisation de %s threads \n",argv[2]);
 				break;
 			case 'z':
-				printf("décompression de %s\n",archive);
+				//printf("décompression de %s\n",archive);
 				break;
 			default:
 				printf("erreur" );
