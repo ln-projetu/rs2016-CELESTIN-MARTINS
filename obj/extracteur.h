@@ -29,4 +29,6 @@ void extractFichier(int fd, struct  header_posix_ustar ma_struct);
 
 void ecrireFichier(int fd, char* nomFichier, int size);
 
+void listeur_detail(int fd, struct header_posix_ustar ma_struct,char* archive);
+
 #endif

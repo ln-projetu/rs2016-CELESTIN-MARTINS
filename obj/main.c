@@ -43,20 +43,21 @@ int main (int argc, char* argv[]){
 	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
-				printf("extrait le contenu de %s\n",archive);
+				//printf("extrait le contenu de %s\n",archive);
 				extractDossier(fd, ma_struct);
 				fdx=open(archive,O_RDONLY);
-				extractFichier(fdx, ma_struct);
-				close (fdx);
+				extractFichier(fdx,ma_struct);
+				close(fdx);
 				break;
 			case 'l':
-				printf("listing détaillé de %s\n",archive);
+				//printf("listing détaillé de %s\n",archive);
+				listeur_detail(fd, ma_struct,archive);
 				break;
 			case 'p':
-				printf("utilisation de %s threads \n",argv[2]);
+				//printf("utilisation de %s threads \n",argv[2]);
 				break;
 			case 'z':
-				printf("décompression de %s\n",archive);
+				//printf("décompression de %s\n",archive);
 				break;
 			default:
 				printf("erreur" );
