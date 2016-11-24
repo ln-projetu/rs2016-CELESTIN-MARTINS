@@ -48,7 +48,7 @@ void convert_permission(char *permission){
 	int powp=100;
 	int current;
 	for (i=0;i<3;i++){
-		current=permission_int/powp;
+		current=(permission_int-(permission_int/(powp*10)*powp*10))/powp;
 		if (current%2!=0){
 			result[2+i*3]='x';
 		}

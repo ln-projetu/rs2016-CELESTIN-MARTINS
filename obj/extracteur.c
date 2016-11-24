@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 #include "utilitaires.h"
 #include "extracteur.h"
-
+#include <utime.h>
 
 
 
@@ -33,41 +33,73 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 	int lu;
 	int size;
 	int longueur;
+	mode_t mode;
+	char *name=malloc(256*sizeof(char));
+	struct utimbuf chtime;
 	do{
-		size=convert_oct_to_dec(ma_struct.size);
-		if (size!=0){
-			if (size%512==0)
-				lseek(fd,(size/512)*512,SEEK_CUR);
-			else 
-				lseek(fd,(size/512+1)*512,SEEK_CUR);
-		}
+		
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
-			if (ma_struct.name[longueur-1]=='/')
-				mkdir(ma_struct.name,0777);
+			if (ma_struct.name[longueur-1]=='/'){
+				mode=strtol(ma_struct.mode,NULL,8);
+				strcpy(name,"");
+				if (strlen(ma_struct.prefix)){
+					strcat(name,ma_struct.prefix);
+					strcat(name,"/");
+				}
+				strcat(name,ma_struct.name);
+				umask(0000);
+				mkdir(name,mode);
+				size=convert_oct_to_dec(ma_struct.size);
+				if (size!=0){
+					if (size%512==0)
+						lseek(fd,(size/512)*512,SEEK_CUR);
+					else 
+						lseek(fd,(size/512+1)*512,SEEK_CUR);
+				}
+				chtime.actime= (time_t) long_convert_oct_to_dec(ma_struct.mtime);
+				chtime.modtime= (time_t) long_convert_oct_to_dec(ma_struct.mtime);
+				utime(name, &chtime);
+			}
 		}
 	}while(lu!=0);
+	free (name);
 }
 
 void extractFichier(int fd, struct header_posix_ustar ma_struct){
 	int lu;
 	int size;
 	int longueur;
+	mode_t mode;
+	char *name= malloc(256*sizeof(char));
+	struct utimbuf chtime;
 	do{
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
 			if (ma_struct.name[longueur-1]!='/'){
 				size=convert_oct_to_dec(ma_struct.size);
-				ecrireFichier(fd,ma_struct.name,size);
+				mode=strtol(ma_struct.mode,NULL,8);
+				strcpy(name,"");
+				if (strlen(ma_struct.prefix)){
+					strcat(name,ma_struct.prefix);
+					strcat(name,"/");
+				}
+				strcat(name,ma_struct.name);
+				ecrireFichier(fd,name,size,mode);
+				chtime.actime= (time_t) long_convert_oct_to_dec(ma_struct.mtime);
+				chtime.modtime= (time_t) long_convert_oct_to_dec(ma_struct.mtime);
+				utime(name, &chtime);
 			}
 		}
 	}while(lu!=0);
+	free(name);
 }
 
-void ecrireFichier(int fd, char* nomFichier, int size){
-	int fdw=open(nomFichier,O_CREAT | O_WRONLY, S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR);
+void ecrireFichier(int fd, char* nomFichier, int size ,mode_t mode){
+	umask(0000);
+	int fdw=open(nomFichier,O_CREAT | O_WRONLY, mode );
 	ssize_t numBytes;
 	int partition=size/256;
 	int reste=size%256;
@@ -95,6 +127,7 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 	int taille_dec;
 	char *typeflag;
 	int isLinkname;
+	char *name=malloc(256*sizeof(char));
 	do{
 		size=convert_oct_to_dec(ma_struct.size);
 		if (size%512==0)
@@ -123,9 +156,15 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 			convert_permission(ma_struct.mode);
 			printf("%s/%s", ma_struct.uid, ma_struct.gid);
 			taille_dec=convert_oct_to_dec(ma_struct.size);
-			printf("%d ", taille_dec);
+			printf(" %d ", taille_dec);
 			date(ma_struct.mtime);
-			printf(" %s",ma_struct.name);
+			strcpy(name,"");
+			if (strlen(ma_struct.prefix)){
+				strcat(name,ma_struct.prefix);
+				strcat(name,"/");
+			}
+			strcat(name,ma_struct.name);
+			printf(" %s",name);
 			if (isLinkname){
 				printf(" -> %s\n", ma_struct.linkname);
 			}
