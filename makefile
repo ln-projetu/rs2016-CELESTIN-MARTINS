@@ -3,9 +3,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -g -I$(IDIR)
 
 ODIR=obj
-LDIR =../lib
 
-LIBS=-lm
 
 _DEPS = utilitaires.h extracteur.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))

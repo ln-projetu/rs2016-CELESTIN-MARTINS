@@ -24,6 +24,7 @@ int main (int argc, char* argv[]){
 		exit(0);
 	}
 	int fdx;
+	int fdt;
 	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
 		switch(opt){
 			case 'x':
@@ -32,6 +33,9 @@ int main (int argc, char* argv[]){
 				fdx=open(archive,O_RDONLY);
 				extractFichier(fdx,ma_struct);
 				close(fdx);
+				fdt=open(archive,O_RDONLY);
+				dateDossier(fdt,ma_struct);
+				close(fdt);
 				break;
 			case 'l':
 				//printf("listing détaillé de %s\n",archive);
