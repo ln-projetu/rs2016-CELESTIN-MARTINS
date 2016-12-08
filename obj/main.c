@@ -6,16 +6,25 @@
 #include <errno.h>
 #include "extracteur.h"
 #include "utilitaires.h"
-
+#include <sys/stat.h>
 
 
 int main (int argc, char* argv[]){
 	int opt;
 	int fd;
 	char* archive=argv[argc-1];
+
+	struct stat st_buf;
+	int status;
+	status = stat(archive, &st_buf);
+
+	if ( (status != 0) | (S_ISDIR(st_buf.st_mode) ) ){
+		printf("Veuillez passez une archive tar en paramètre \n");
+		exit(1);
+	}
 	fd=open(archive,O_RDONLY);
-	if (fd==-1){
-		fprintf(stderr, "%s\n", strerror(errno));
+	if (fd==-1 ){
+		printf("%s\n", strerror(errno));
 		exit(1);
 	}
 	if (optind+1==argc){

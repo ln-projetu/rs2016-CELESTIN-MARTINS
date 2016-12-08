@@ -37,7 +37,7 @@ void date(char *octalTime )
     char       buf[80];
     epoch= (time_t)decTime;
     ts = *localtime(&epoch);
-    strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S", &ts);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &ts);
     printf("%s", buf);
 }
 

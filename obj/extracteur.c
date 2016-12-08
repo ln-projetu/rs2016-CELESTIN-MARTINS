@@ -35,8 +35,6 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 	int longueur;
 	mode_t mode;
 	char *name=malloc(512*sizeof(char));
-	/*struct utimbuf chtime;
-	time_t dtime;*/
 
 	do{
 		
@@ -56,10 +54,7 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 	
 				mkdir(name, mode);
 				size=convert_oct_to_dec(ma_struct.size);
-				/*dtime=long_convert_oct_to_dec(ma_struct.mtime);
-				chtime.actime= dtime;
-				chtime.modtime= dtime;
-				utime(name, &chtime);*/
+
 				
 				if (size!=0){
 					if (size%512==0)
@@ -88,7 +83,7 @@ void dateDossier(int fd, struct header_posix_ustar ma_struct){
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
-			if (ma_struct.name[longueur-1]=='/'){
+			if (!strcmp(ma_struct.typeflag,"5")){
 				strcpy(name,"");
 				if (strlen(ma_struct.prefix)){
 					strcat(name,ma_struct.prefix);
@@ -125,7 +120,7 @@ void extractFichier(int fd, struct header_posix_ustar ma_struct){
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
-			if (ma_struct.name[longueur-1]!='/'){
+			if (!strcmp(ma_struct.typeflag,"0")){
 				size=convert_oct_to_dec(ma_struct.size);
 				mode=strtol(ma_struct.mode,NULL,8);
 				strcpy(name,"");
@@ -201,7 +196,7 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 			}
 			}
 			convert_permission(ma_struct.mode);
-			printf("%s/%s", ma_struct.uid, ma_struct.gid);
+			printf("%li/%li", strtol(ma_struct.uid,NULL,8), strtol(ma_struct.gid,NULL,8));
 			taille_dec=convert_oct_to_dec(ma_struct.size);
 			printf(" %d ", taille_dec);
 			date(ma_struct.mtime);
