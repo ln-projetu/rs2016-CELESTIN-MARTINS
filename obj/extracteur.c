@@ -195,17 +195,17 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 		if (longueur!=0){
 			isLinkname=0;
 			typeflag=ma_struct.typeflag;
-			if (!strcmp(typeflag,"0"))
+			if (typeflag[0]=='0')
 				printf("-");
 			else
 			{
-			if(atoi(typeflag)==2){
+			if(typeflag[0]=='2'){
 					printf("l");
 					isLinkname=1;
 				}
 			else
 			{
-			if(!strcmp(typeflag,"5"))
+			if(typeflag[0]=='5')
 					printf("d");
 			}
 			}
