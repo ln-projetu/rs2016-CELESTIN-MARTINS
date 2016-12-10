@@ -9,7 +9,10 @@
 #include "utilitaires.h"
 #include "extracteur.h"
 #include <utime.h>
-
+/*#include <assert.h>
+#include <dlfcn.h>
+//#include "~/Documents/Projet_RS/rs2016-CELESTIN-MARTINS/lib/zlib/zlib.h"
+#define CHUNK 16384*/
 
 
 void listeur(int fd, struct header_posix_ustar ma_struct){
@@ -134,6 +137,17 @@ void extractFichier(int fd, struct header_posix_ustar ma_struct){
 				chtime.modtime= (time_t) long_convert_oct_to_dec(ma_struct.mtime);
 				utime(name, &chtime);
 			}
+			else{
+				if(atoi(ma_struct.typeflag)==2){
+					strcpy(name,"");
+					if (strlen(ma_struct.prefix)){
+						strcat(name,ma_struct.prefix);
+						strcat(name,"/");
+					}
+					strcat(name,ma_struct.name);
+					symlink(ma_struct.linkname,name);
+				}
+			}
 		}
 	}while(lu!=0);
 	free(name);
@@ -185,7 +199,7 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 				printf("-");
 			else
 			{
-			if(!strcmp(typeflag,"2")){
+			if(atoi(typeflag)==2){
 					printf("l");
 					isLinkname=1;
 				}
@@ -214,3 +228,52 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 		}
 	}while (lu!=0);
 }
+
+
+/*int decompress(FILE *source, FILE *dest){
+	dlopen("libz.so", RTLD_NOW);
+	int ret;
+    unsigned have;
+    z_stream strm;
+    unsigned char in[CHUNK];
+    unsigned char out[CHUNK];
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    strm.avail_in = 0;
+    strm.next_in = Z_NULL;
+    ret = inflateInit(&strm);
+    if (ret != Z_OK)
+        return ret;
+    do{
+    	strm.avail_in = fread(in, 1, CHUNK, source);
+        if (ferror(source)) {
+            (void)inflateEnd(&strm);
+            return Z_ERRNO;
+        }
+        if (strm.avail_in == 0)
+            break;
+        strm.next_in = in;
+        do{
+        	strm.avail_out = CHUNK;
+            strm.next_out = out;
+            ret = inflate(&strm, Z_NO_FLUSH);
+            assert(ret != Z_STREAM_ERROR); 
+            switch (ret) {
+            case Z_NEED_DICT:
+                ret = Z_DATA_ERROR;  
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+                (void)inflateEnd(&strm);
+                return ret;
+            }
+            have = CHUNK - strm.avail_out;
+            if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
+                (void)inflateEnd(&strm);
+                return Z_ERRNO;
+            }
+        } while (strm.avail_out == 0);
+    } while (ret != Z_STREAM_END);
+    (void)inflateEnd(&strm);
+    return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
+}*/

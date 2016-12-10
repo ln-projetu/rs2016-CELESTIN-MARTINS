@@ -33,4 +33,6 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct);
 
 void dateDossier(int fd, struct header_posix_ustar ma_struct);
 
+/*int decompress(FILE *source, FILE *dest);*/
+
 #endif
