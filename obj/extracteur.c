@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 #include "utilitaires.h"
 #include "extracteur.h"
 #include <utime.h>
@@ -44,7 +45,7 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
-			if (ma_struct.name[longueur-1]=='/'){
+			if (ma_struct.typeflag[0]=='5'){
 				mode=strtol(ma_struct.mode,NULL,8);
 				strcpy(name,"");
 				if (strlen(ma_struct.prefix)){
@@ -86,7 +87,7 @@ void dateDossier(int fd, struct header_posix_ustar ma_struct){
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
-			if (!strcmp(ma_struct.typeflag,"5")){
+			if (ma_struct.typeflag[0]=='5'){
 				strcpy(name,"");
 				if (strlen(ma_struct.prefix)){
 					strcat(name,ma_struct.prefix);
@@ -119,11 +120,13 @@ void extractFichier(int fd, struct header_posix_ustar ma_struct){
 	mode_t mode;
 	char *name= malloc(256*sizeof(char));
 	struct utimbuf chtime;
+	struct timeval symtime[2];
+	long timesym;
 	do{
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
-			if (!strcmp(ma_struct.typeflag,"0")){
+			if (ma_struct.typeflag[0]=='0'){
 				size=convert_oct_to_dec(ma_struct.size);
 				mode=strtol(ma_struct.mode,NULL,8);
 				strcpy(name,"");
@@ -138,7 +141,7 @@ void extractFichier(int fd, struct header_posix_ustar ma_struct){
 				utime(name, &chtime);
 			}
 			else{
-				if(atoi(ma_struct.typeflag)==2){
+				if(ma_struct.typeflag[0]=='2'){
 					strcpy(name,"");
 					if (strlen(ma_struct.prefix)){
 						strcat(name,ma_struct.prefix);
@@ -146,6 +149,12 @@ void extractFichier(int fd, struct header_posix_ustar ma_struct){
 					}
 					strcat(name,ma_struct.name);
 					symlink(ma_struct.linkname,name);
+					timesym=long_convert_oct_to_dec(ma_struct.mtime);
+					symtime[0].tv_sec=timesym;
+					symtime[0].tv_usec=0;
+					symtime[1].tv_sec=timesym;
+					symtime[1].tv_usec=0;
+					lutimes(name, symtime);
 				}
 			}
 		}
@@ -195,17 +204,17 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 		if (longueur!=0){
 			isLinkname=0;
 			typeflag=ma_struct.typeflag;
-			if (!strcmp(typeflag,"0"))
+			if (typeflag[0]=='0')
 				printf("-");
 			else
 			{
-			if(atoi(typeflag)==2){
+			if(typeflag[0]=='2'){
 					printf("l");
 					isLinkname=1;
 				}
 			else
 			{
-			if(!strcmp(typeflag,"5"))
+			if(typeflag[0]=='5')
 					printf("d");
 			}
 			}
