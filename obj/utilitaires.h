@@ -9,4 +9,6 @@ void date(char *octalTime );
 
 void convert_permission(char *permission);
 
+int sommeAscii(char a[], int taille);
+
 #endif

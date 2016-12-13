@@ -10,10 +10,12 @@
 #include "utilitaires.h"
 #include "extracteur.h"
 #include <utime.h>
-/*#include <assert.h>
+#include <assert.h>
+#include "../lib/zlib/zlib.h"
 #include <dlfcn.h>
-//#include "~/Documents/Projet_RS/rs2016-CELESTIN-MARTINS/lib/zlib/zlib.h"
-#define CHUNK 16384*/
+#define CHUNK 131272
+
+
 
 
 void listeur(int fd, struct header_posix_ustar ma_struct){
@@ -239,7 +241,7 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 }
 
 
-/*int decompress(FILE *source, FILE *dest){
+int decompress(FILE *source, FILE *dest){
 	dlopen("libz.so", RTLD_NOW);
 	int ret;
     unsigned have;
@@ -255,7 +257,7 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
     if (ret != Z_OK)
         return ret;
     do{
-    	strm.avail_in = fread(in, 1, CHUNK, source);
+    	strm.avail_in = fread(in, 512, CHUNK, source);
         if (ferror(source)) {
             (void)inflateEnd(&strm);
             return Z_ERRNO;
@@ -269,20 +271,61 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
             ret = inflate(&strm, Z_NO_FLUSH);
             assert(ret != Z_STREAM_ERROR); 
             switch (ret) {
-            case Z_NEED_DICT:
-                ret = Z_DATA_ERROR;  
-            case Z_DATA_ERROR:
-            case Z_MEM_ERROR:
-                (void)inflateEnd(&strm);
-                return ret;
+	            case Z_NEED_DICT:
+	            	printf("dico\n");
+	                ret = Z_DATA_ERROR;  
+	            case Z_DATA_ERROR:
+	            	printf("dataerror\n");
+	            case Z_MEM_ERROR:
+	                (void)inflateEnd(&strm);
+	                printf("retour milieu\n");
+	                return ret;
             }
             have = CHUNK - strm.avail_out;
-            if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
+            if (fwrite(out, 512, have, dest) != have || ferror(dest)) {
                 (void)inflateEnd(&strm);
+                printf("errfin\n");
                 return Z_ERRNO;
             }
         } while (strm.avail_out == 0);
     } while (ret != Z_STREAM_END);
     (void)inflateEnd(&strm);
+    printf("fin\n");
     return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
-}*/
+}
+
+
+void isCorrupted(int fd, struct header_posix_ustar ma_struct){
+	int actualSum;
+	int size;
+	//read(fd,&ma_struct,512);
+	while (read(fd,&ma_struct,512),atoi(ma_struct.checksum)!=0){
+		actualSum=0;
+		actualSum=
+					sommeAscii(ma_struct.name,100) +
+					sommeAscii(ma_struct.mode,8) +
+					sommeAscii(ma_struct.uid,8) +
+					sommeAscii(ma_struct.gid,8) +
+					sommeAscii(ma_struct.size,12) +
+					sommeAscii(ma_struct.mtime,12) +
+					sommeAscii(ma_struct.typeflag,1) +
+					sommeAscii(ma_struct.linkname,100) +
+					sommeAscii(ma_struct.magic,6) +
+					sommeAscii(ma_struct.version,2) +
+					sommeAscii(ma_struct.uname,32) +
+					sommeAscii(ma_struct.gname, 32) +
+					sommeAscii(ma_struct.devmajor,8) +
+					sommeAscii(ma_struct.devminor,8) +
+					sommeAscii(ma_struct.prefix,155) +
+					sommeAscii(ma_struct.pad,12) +
+					8*32;
+		if (actualSum!=(int)strtol(ma_struct.checksum,NULL,8)){
+			exit(-1);
+		}
+		size=convert_oct_to_dec(ma_struct.size);
+		if (size%512==0)
+			lseek(fd,(size/512)*512,SEEK_CUR);
+		else 
+			lseek(fd,(size/512+1)*512,SEEK_CUR);
+	}
+}

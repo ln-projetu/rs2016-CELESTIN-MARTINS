@@ -1,9 +1,11 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-Wall -Wextra -g -I$(IDIR)
+CFLAGS=-Wall -Wextra -g -I$(IDIR) -L$(LDIR)
 
 ODIR=obj
+LDIR=../lib/zlib
 
+LIBS=-lz -ldl
 
 _DEPS = utilitaires.h extracteur.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
@@ -16,7 +18,7 @@ $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -g -c -o $@ $< $(CFLAGS)
 
 ptar: $(OBJ)
-	gcc -g -o $@ $^ $(CFLAGS) $(LIBS)
+	gcc -g -o $@ $^ $(CFLAGS) $(LIBS) 
 
 .PHONY: clean
 

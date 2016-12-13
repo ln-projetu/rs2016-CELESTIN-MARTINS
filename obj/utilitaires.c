@@ -62,3 +62,12 @@ void convert_permission(char *permission){
 	}
 	printf("%s ", result);
 }
+
+int sommeAscii(char a[], int taille){
+	int somme=0;
+	int i;
+	for (i=0;i<taille;i++){
+		somme+=(int)a[i];
+	}
+	return somme;
+}

@@ -24,12 +24,17 @@ int main (int argc, char* argv[]){
 	
 
 	if (optind+1==argc){
-		int fd;
-		fd=open(archive,O_RDONLY);
-		if (fd==-1 ){
+		int fds;
+		fds=open(archive,O_RDONLY);
+		if (fds==-1 ){
 			printf("%s\n", strerror(errno));
 			exit(1);
 		}
+		isCorrupted(fds, ma_struct);
+		close(fds);
+		printf("yo\n");
+		int fd;
+		fd=open(archive,O_RDONLY);
 		listeur(fd, ma_struct);
 		close(fd);
 		exit(0);
@@ -59,6 +64,9 @@ int main (int argc, char* argv[]){
 				close(fdt);
 				break;
 			case 'l': ;
+				int fds;
+				fds=open(archive,O_RDONLY);
+				isCorrupted(fds, ma_struct);
 				int fdi;
 				fdi=open(archive,O_RDONLY);
 				listeur_detail(fdi, ma_struct);
@@ -66,18 +74,20 @@ int main (int argc, char* argv[]){
 			case 'p':
 				//printf("utilisation de %s threads \n",argv[2]);
 				break;
-			case 'z':
-				/*;
-				long tai=(long)strlen(archive);
+			case 'z': ;
+				int tai=(int)strlen(archive)-2;
 				char *decompresse=malloc(tai*sizeof(char));
-				strcat(strcpy(decompresse,archive),".tar");
-				FILE *source=malloc(sizeof(FILE));
+				memcpy( decompresse, &archive[0], tai );
+				decompresse[tai-1]='\0';
+				FILE *source;
+				FILE *destination;
 				source=fopen(archive,"r");
-				FILE *destination=malloc(sizeof(FILE));
 				destination=fopen(decompresse,"w");
 				decompress(source,destination);
 				fclose(source);
-				fclose(destination);*/
+				fclose(destination);
+				free(decompresse);	
+				//printf("%d\n", a);			
 				break;
 			default:
 				printf("erreur" );
@@ -86,5 +96,3 @@ int main (int argc, char* argv[]){
 	}
 	return(0);
 }
-
-
