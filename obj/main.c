@@ -53,10 +53,10 @@ int main (int argc, char* argv[]){
 				extractDossier(fdd, ma_struct);
 				close(fdd);
 				
-				int fdx;
+				/*int fdx;
 				fdx=open(archive,O_RDONLY);
 				extractFichier(fdx,ma_struct);
-				close(fdx);
+				close(fdx);*/
 
 				int fdt;
 				fdt=open(archive,O_RDONLY);

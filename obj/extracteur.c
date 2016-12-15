@@ -42,6 +42,9 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 	int longueur;
 	mode_t mode;
 	char *name=malloc(512*sizeof(char));
+	struct utimbuf chtime;
+	struct timeval symtime[2];
+	long timesym;
 
 	do{
 		
@@ -50,6 +53,7 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 		if (longueur!=0){
 			if (ma_struct.typeflag[0]=='5'){
 				mode=strtol(ma_struct.mode,NULL,8);
+
 				strcpy(name,"");
 				if (strlen(ma_struct.prefix)){
 					strcat(name,ma_struct.prefix);
@@ -62,17 +66,51 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 				mkdir(name, mode);
 				size=convert_oct_to_dec(ma_struct.size);
 
-				
 				if (size!=0){
 					if (size%512==0)
-						lseek(fd,(size/512)*512,SEEK_CUR);
-					else 
-						lseek(fd,(size/512+1)*512,SEEK_CUR);
+							lseek(fd,(size/512)*512,SEEK_CUR);
+						else 
+							lseek(fd,(size/512+1)*512,SEEK_CUR);
 				}
-				
-				
-
 			}
+
+			if (ma_struct.typeflag[0]=='0'){
+				size=convert_oct_to_dec(ma_struct.size);
+				mode=strtol(ma_struct.mode,NULL,8);
+
+				strcpy(name,"");
+				if (strlen(ma_struct.prefix)){
+					strcat(name,ma_struct.prefix);
+					strcat(name,"/");
+				}
+				strcat(name,ma_struct.name);
+
+				ecrireFichier(fd,name,size,mode);
+
+				chtime.actime= (time_t) long_convert_oct_to_dec(ma_struct.mtime);
+				chtime.modtime= (time_t) long_convert_oct_to_dec(ma_struct.mtime);
+				utime(name, &chtime);
+			}
+
+			if(ma_struct.typeflag[0]=='2'){
+
+				strcpy(name,"");
+				if (strlen(ma_struct.prefix)){
+					strcat(name,ma_struct.prefix);
+					strcat(name,"/");
+				}
+				strcat(name,ma_struct.name);
+
+				symlink(ma_struct.linkname,name);
+
+				timesym=long_convert_oct_to_dec(ma_struct.mtime);
+				symtime[0].tv_sec=timesym;
+				symtime[0].tv_usec=0;
+				symtime[1].tv_sec=timesym;
+				symtime[1].tv_usec=0;
+				lutimes(name, symtime);
+			}
+				
 		}
 	}while(lu!=0);
 	free (name);
@@ -116,7 +154,7 @@ void dateDossier(int fd, struct header_posix_ustar ma_struct){
 }
 
 
-void extractFichier(int fd, struct header_posix_ustar ma_struct){
+/*void extractFichier(int fd, struct header_posix_ustar ma_struct){
 	int lu;
 	int size;
 	int longueur;
@@ -163,7 +201,7 @@ void extractFichier(int fd, struct header_posix_ustar ma_struct){
 		}
 	}while(lu!=0);
 	free(name);
-}
+}*/
 
 void ecrireFichier(int fd, char* nomFichier, int size ,mode_t mode){
 	umask(0000);
