@@ -48,7 +48,6 @@ int main (int argc, char* argv[]){
 				listeur(fd, ma_struct);
 				close(fd);
 
-				printf("ici\n");
 				int fdd;
 				fdd=open(archive,O_RDONLY);
 				extractDossier(fdd, ma_struct);

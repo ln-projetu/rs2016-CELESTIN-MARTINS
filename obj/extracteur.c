@@ -234,7 +234,7 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 			strcat(name,ma_struct.name);
 			printf(" %s",name);
 			if (isLinkname){
-				printf(" -> %s\n", ma_struct.linkname);
+				printf(" -> %s", ma_struct.linkname);
 			}
 			printf("\n");
 		}
@@ -256,6 +256,7 @@ int simpleDecompress(char *archivegz, char *archivetar){
 	gzFile source = gzopen(archivegz, "rb");
 	creat(archivetar, 0777);
 	FILE *destination= fopen (archivetar, "wb");
+
 	if (!source || !destination) 
 		return -1;
 
@@ -264,6 +265,7 @@ int simpleDecompress(char *archivegz, char *archivetar){
 	while((read=gzread(source, buffer, sizeof(buffer)))>0){
 		fwrite(buffer, 1, read, destination);
 	}
+	
 	gzclose(source);
 	fclose(destination);
 	dlclose(handle);
@@ -305,3 +307,5 @@ void isCorrupted(int fd, struct header_posix_ustar ma_struct){
 			lseek(fd,(size/512+1)*512,SEEK_CUR);
 	}
 }
+
+
