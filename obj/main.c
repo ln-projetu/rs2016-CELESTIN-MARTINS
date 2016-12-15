@@ -43,14 +43,10 @@ int main (int argc, char* argv[]){
 	while ((opt=getopt(argc, argv, "xlp:z"))!=-1){
 		switch(opt){
 			case 'x': ;
-				int fd;
-				fd=open(archive,O_RDONLY);
-				listeur(fd, ma_struct);
-				close(fd);
 
 				int fdd;
 				fdd=open(archive,O_RDONLY);
-				extractDossier(fdd, ma_struct);
+				extract(fdd, ma_struct);
 				close(fdd);
 				
 				/*int fdx;

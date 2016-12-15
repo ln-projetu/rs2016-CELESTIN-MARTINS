@@ -36,7 +36,7 @@ void listeur(int fd, struct header_posix_ustar ma_struct){
 	}while (lu!=0);
 }
 
-void extractDossier(int fd, struct header_posix_ustar ma_struct){
+void extract(int fd, struct header_posix_ustar ma_struct){
 	int lu;
 	int size;
 	int longueur;
@@ -51,6 +51,8 @@ void extractDossier(int fd, struct header_posix_ustar ma_struct){
 		lu=read(fd,&ma_struct.name,512);
 		longueur=strlen(ma_struct.name);
 		if (longueur!=0){
+			printf("%s\n",ma_struct.name);
+			
 			if (ma_struct.typeflag[0]=='5'){
 				mode=strtol(ma_struct.mode,NULL,8);
 
