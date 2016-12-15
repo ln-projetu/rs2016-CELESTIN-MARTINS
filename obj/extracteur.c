@@ -13,7 +13,8 @@
 #include <assert.h>
 #include "../lib/zlib/zlib.h"
 #include <dlfcn.h>
-#define CHUNK 131272
+#include <pthread.h>
+#define CHUNK 16384
 
 
 
@@ -241,64 +242,39 @@ void listeur_detail(int fd, struct header_posix_ustar ma_struct){
 }
 
 
-int decompress(FILE *source, FILE *dest){
-	dlopen("libz.so", RTLD_NOW);
-	int ret;
-    unsigned have;
-    z_stream strm;
-    unsigned char in[CHUNK];
-    unsigned char out[CHUNK];
-    strm.zalloc = Z_NULL;
-    strm.zfree = Z_NULL;
-    strm.opaque = Z_NULL;
-    strm.avail_in = 0;
-    strm.next_in = Z_NULL;
-    ret = inflateInit(&strm);
-    if (ret != Z_OK)
-        return ret;
-    do{
-    	strm.avail_in = fread(in, 512, CHUNK, source);
-        if (ferror(source)) {
-            (void)inflateEnd(&strm);
-            return Z_ERRNO;
-        }
-        if (strm.avail_in == 0)
-            break;
-        strm.next_in = in;
-        do{
-        	strm.avail_out = CHUNK;
-            strm.next_out = out;
-            ret = inflate(&strm, Z_NO_FLUSH);
-            assert(ret != Z_STREAM_ERROR); 
-            switch (ret) {
-	            case Z_NEED_DICT:
-	            	printf("dico\n");
-	                ret = Z_DATA_ERROR;  
-	            case Z_DATA_ERROR:
-	            	printf("dataerror\n");
-	            case Z_MEM_ERROR:
-	                (void)inflateEnd(&strm);
-	                printf("retour milieu\n");
-	                return ret;
-            }
-            have = CHUNK - strm.avail_out;
-            if (fwrite(out, 512, have, dest) != have || ferror(dest)) {
-                (void)inflateEnd(&strm);
-                printf("errfin\n");
-                return Z_ERRNO;
-            }
-        } while (strm.avail_out == 0);
-    } while (ret != Z_STREAM_END);
-    (void)inflateEnd(&strm);
-    printf("fin\n");
-    return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
+int simpleDecompress(char *archivegz, char *archivetar){
+
+	gzFile (*gzopen)();
+	int (*gzread)();
+	void (*gzclose)();
+
+	void* handle = dlopen("libz.so", RTLD_NOW);
+	gzopen = dlsym(handle, "gzopen");
+	gzread = dlsym(handle, "gzread");
+	gzclose = dlsym(handle, "gzclose");
+
+	gzFile source = gzopen(archivegz, "rb");
+	creat(archivetar, 0777);
+	FILE *destination= fopen (archivetar, "wb");
+	if (!source || !destination) 
+		return -1;
+
+	char buffer[CHUNK];
+	int read=0;
+	while((read=gzread(source, buffer, sizeof(buffer)))>0){
+		fwrite(buffer, 1, read, destination);
+	}
+	gzclose(source);
+	fclose(destination);
+	dlclose(handle);
+
+	return 0;
 }
 
 
 void isCorrupted(int fd, struct header_posix_ustar ma_struct){
 	int actualSum;
 	int size;
-	//read(fd,&ma_struct,512);
 	while (read(fd,&ma_struct,512),atoi(ma_struct.checksum)!=0){
 		actualSum=0;
 		actualSum=

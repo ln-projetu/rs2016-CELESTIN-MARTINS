@@ -18,7 +18,7 @@ int main (int argc, char* argv[]){
 	status = stat(archive, &st_buf);
 
 	if ( (status != 0) | (S_ISDIR(st_buf.st_mode) ) ){
-		printf("Veuillez passez une archive tar en paramètre \n");
+		printf("Veuillez passez une archive tar en paramètre existante\n");
 		exit(1);
 	}
 	
@@ -32,15 +32,15 @@ int main (int argc, char* argv[]){
 		}
 		isCorrupted(fds, ma_struct);
 		close(fds);
-		printf("yo\n");
 		int fd;
 		fd=open(archive,O_RDONLY);
 		listeur(fd, ma_struct);
 		close(fd);
 		exit(0);
 	}
+
 	
-	while ((opt=getopt(argc, argv, "xlpz"))!=-1){
+	while ((opt=getopt(argc, argv, "xlp:z"))!=-1){
 		switch(opt){
 			case 'x': ;
 				int fd;
@@ -48,6 +48,7 @@ int main (int argc, char* argv[]){
 				listeur(fd, ma_struct);
 				close(fd);
 
+				printf("ici\n");
 				int fdd;
 				fdd=open(archive,O_RDONLY);
 				extractDossier(fdd, ma_struct);
@@ -79,15 +80,15 @@ int main (int argc, char* argv[]){
 				char *decompresse=malloc(tai*sizeof(char));
 				memcpy( decompresse, &archive[0], tai );
 				decompresse[tai-1]='\0';
-				FILE *source;
-				FILE *destination;
-				source=fopen(archive,"r");
-				destination=fopen(decompresse,"w");
-				decompress(source,destination);
-				fclose(source);
-				fclose(destination);
+
+				simpleDecompress(archive,decompresse);
+
+				int i;
+				for (i=0; i<(int)strlen(decompresse)+1;i++){
+					archive[i]=decompresse[i];
+				}
 				free(decompresse);	
-				//printf("%d\n", a);			
+							
 				break;
 			default:
 				printf("erreur" );

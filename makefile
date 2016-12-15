@@ -5,7 +5,7 @@ CFLAGS=-Wall -Wextra -g -I$(IDIR) -L$(LDIR)
 ODIR=obj
 LDIR=../lib/zlib
 
-LIBS=-lz -ldl
+LIBS= -ldl
 
 _DEPS = utilitaires.h extracteur.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
